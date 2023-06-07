@@ -1,20 +1,19 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import SearchMovies from "./SearchMovies";
 
-const UseMovies = (movie, sort)=> {        
+const UseMovies = (sort)=> {        
     const [movies, setMovies] = useState([])
     const [loading, setLoading] = useState(false)    
-    const prevMovie = useRef("")
+    const prevMovie = useRef("")            
 
-    const getMovies = useCallback(async ()=> {
+    const getMovies = useCallback(async (movie)=> {        
         if(prevMovie.current === movie) return        
-
         setLoading(true)        
         const newMovies = await SearchMovies(movie)
         prevMovie.current = movie
         setMovies(newMovies)
         setLoading(false)        
-    }, [movie])
+    }, [])
 
     const sortMovie = useMemo(()=> {                
         return sort ? 

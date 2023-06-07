@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css';
 import Movies from './components/Movies';
 import UseMovies from './components/UseMovies';
+import debounce from 'just-debounce-it';
 
 function UseSearch() {
     const [search, setSearch] = useState("")
     const [error, setError] = useState("")
     const isFirstInput = useRef(true)
 
-    useEffect(()=>{
+    useEffect(()=>{        
         if(isFirstInput.current) {
-            isFirstInput.current = search === ""            
+            isFirstInput.current = false
             return
         }
 
@@ -33,16 +34,21 @@ function UseSearch() {
 function App() {
     const {search, error, setSearch} = UseSearch()
     const [sort, setSort] = useState(false)
-    const {movies, getMovies, loading} = UseMovies(search, sort)
+    const {movies, getMovies, loading} = UseMovies(sort)    
+
+    const getDebounceMovies = useCallback(debounce(search =>{        
+        getMovies(search)                
+    }, 300)
+    , [])
 
     const handleChangeInput = (e)=> {        
-        if(e.target.value.startsWith(" ")) return
-        setSearch(e.target.value)
+        if(e.target.value.startsWith(" ")) return        
+        setSearch(e.target.value)        
+        getDebounceMovies(search)
     }
     
     const handleSubmit = (event)=>{
-        event.preventDefault();
-        getMovies()
+        event.preventDefault();        
     }
 
     const handleCheck = ()=> {
